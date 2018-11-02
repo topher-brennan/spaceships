@@ -1,5 +1,5 @@
 class HullSection
-	attr_accessor :ship
+	attr_accessor :ship, :systems, :core
 
 	def initialize(systems, core)
 		raise ArgumentError.new("Must have six systems.") unless systems.count == 6

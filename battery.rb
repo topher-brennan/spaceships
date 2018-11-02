@@ -13,15 +13,16 @@ class Battery < System
 	SHIP_SIZE = 4
 
 	def fire(hull_section, range)
-		effective_skill = self.section.ship.crew_skill + RANGE_PENALTY[range] + SHIP_SIZE
+		target = hull_section.ship
 
+		effective_skill = self.section.ship.crew_skill + RANGE_PENALTY[range] + SHIP_SIZE
     attack_roll = success_roll(effective_skill)
 
 		if attack_roll.is_success
 			hits = attack_roll.margin_of_success + 1
 
 			unless attack_roll.is_critical_success
-				dodge_roll = success_roll(hull_section.ship.dodge, true)
+				dodge_roll = success_roll(target.dodge, true)
 
 				if dodge_roll.is_success
 					hits -= dodge_roll.margin_of_success + 1
