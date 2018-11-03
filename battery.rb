@@ -51,7 +51,20 @@ class Battery < System
 
 				damage -= (total_armor / ARMOR_DIVISOR).floor
 
-				# TODO: Find non-destroyed system to apply damage to
+				unless hull_section.systems.all? { |system| system.status == :destroyed }
+					while hull_section.systems[hit_location].status == :destroyed
+						hit_location += 1
+						hit_location = 0 if hit_location > 5
+					end
+
+					if damage > Ship::MAX_HP / 2
+						hull_section.systems[hit_location].destroy
+					elsif damage > Ship::MAX_HP / 10
+						hull_section.systems[hit_location]
+					end
+				end
+
+				# TODO: Handle spill-over into core, then other hull sections
 				# TODO: Apply damage to ship and check for survival
 			end
 		elsif attack_roll.is_critical_failure
