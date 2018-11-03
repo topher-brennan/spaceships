@@ -1,32 +1,20 @@
 require './ship.rb'
 require './hull_section.rb'
-require './armor.rb'
+require './light_alloy.rb'
+
+
+section_prototype =
+	HullSection.new([
+		LightAlloy.new(),
+		LightAlloy.new(),
+		LightAlloy.new(),
+		LightAlloy.new(),
+		LightAlloy.new(),
+		LightAlloy.new(),
+	], nil)
 
 ship = Ship.new(
-	HullSection.new([
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1)
-	], nil),
-
-	HullSection.new([
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1)
-	], nil),
-
-	HullSection.new([
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1),
-		Armor.new(1)
-	], nil)
+  section_prototype.deep_dup,
+  section_prototype.deep_dup,
+  section_prototype.deep_dup
 )

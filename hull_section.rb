@@ -13,4 +13,10 @@ class HullSection
 
 		core.section = self if core
 	end
+
+	def deep_dup
+		new_systems = systems.map { |system| system.dup }
+		new_core = (core == nil ? nil : core.dup)
+		HullSection.new(new_systems, new_core)
+	end
 end

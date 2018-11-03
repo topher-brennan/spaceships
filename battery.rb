@@ -1,25 +1,29 @@
 require './system.rb'
+require './gurps_utils.rb'
 
 class Battery < System
 	include GurpsUtils
 
 	RANGE_PENALTY = {
-		point_blank: 0,
-		close: -4,
-		short: -8,
-		long: -12
+		0 => 0, # point-blank
+		1 => -4, # close
+		2 => -8, # short
+		3 => -12 # long
 	}
 
 	SHIP_SIZE = 4
+	FIXED_BONUS = 2
 
 	def fire(hull_section, range)
+		raise ArgumentError.new("Max range exceeded.") if range > MAX_RANGE
+
 		target = hull_section.ship
 
-		effective_skill = self.section.ship.crew_skill + RANGE_PENALTY[range] + SHIP_SIZE
+		effective_skill = self.section.ship.crew_skill + RANGE_PENALTY[range] + SHIP_SIZE + FIXED_BONUS + rof_bonus
     attack_roll = success_roll(effective_skill)
 
 		if attack_roll.is_success
-			hits = attack_roll.margin_of_success + 1
+			hits = [attack_roll.margin_of_success + 1, rof].min
 
 			unless attack_roll.is_critical_success
 				dodge_roll = success_roll(target.dodge, true)
@@ -31,12 +35,48 @@ class Battery < System
 			end
 
 			hits.times do
-				damage = d(3)
-			  damage = damage / 2 if range == :long
-				# subtract armor		
+				damage = roll_damage
+			  damage = damage / 2 if range > HALF_D
+				
+				hit_location = d() - 1
+				total_armor = 0
+
+				6.times do |i|
+					system = hull_section.systems[i]
+
+					if (hit_location != i || system.status != :destroyed) && system.class <= Armor
+						total_armor += system.ddr
+					end
+				end
+
+				damage -= (total_armor / ARMOR_DIVISOR).floor
+
+				# TODO: Find non-destroyed system to apply damage to
+				# TODO: Apply damage to ship and check for survival
 			end
 		elsif attack_roll.is_critical_failure
-			# battery becomes disabled
+			disable
+		end
+	end
+	
+	def rof
+		Scale::ROF_MULTIPLIER * BASE_ROF
+	end
+
+	def rof_bonus
+		case rof
+		when (1..4)
+			0
+		when (5..8)
+			1
+		when (9..12)
+			2
+		when (13..16)
+			3
+		when (17..24)
+			4
+		else # ROF > 30 not supported.
+			5
 		end
 	end
 end	

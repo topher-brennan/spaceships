@@ -1,3 +1,5 @@
+require './scale.rb'
+
 class Ship
 	attr_accessor :hp
 
@@ -5,7 +7,6 @@ class Ship
 
 	CREW_SKILL = 11
 	HANDLING = 0
-	SCALE_DODGE_BONUS = 2
 
 	def initialize(front_hull, central_hull, rear_hull)
 		@hp = MAX_HP
@@ -24,6 +25,6 @@ class Ship
 	end
 
 	def dodge
-		skill / 2 + HANDLING + SCALE_DODGE_BONUS
+		skill / 2 + HANDLING + Scale::DODGE_BONUS
 	end
 end
