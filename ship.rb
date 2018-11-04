@@ -4,9 +4,10 @@ class Ship
 	attr_accessor :hp, :destroyed?
 
 	MAX_HP = 15
+	HT = 12
 
 	CREW_SKILL = 11
-	HANDLING = 0
+	HANDLING = 0 #TODO: make this a function that returns -2 if ship at 0 hp or less
 
 	def initialize(front_hull, central_hull, rear_hull)
 		@hp = MAX_HP
@@ -39,5 +40,9 @@ class Ship
 				destroyed? = true unless d(3) < HT
 			end
 		end
+	end
+
+	def deep_dup
+		# TODO
 	end
 end

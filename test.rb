@@ -10,7 +10,7 @@ section_prototype =
 		LightAlloy.new(),
 		LightAlloy.new(),
 		LightAlloy.new(),
-		LightAlloy.new(),
+		UvLaser.new(),
 	], nil)
 
 ship = Ship.new(
