@@ -1,7 +1,7 @@
 require './scale.rb'
 
 class Ship
-	attr_accessor :hp
+	attr_accessor :hp, :destroyed?
 
 	MAX_HP = 15
 
@@ -10,6 +10,7 @@ class Ship
 
 	def initialize(front_hull, central_hull, rear_hull)
 		@hp = MAX_HP
+		@destroyed? = false
 
 		@front_hull = front_hull
 		@central_hull = central_hull
@@ -26,5 +27,17 @@ class Ship
 
 	def dodge
 		skill / 2 + HANDLING + Scale::DODGE_BONUS
+	end
+
+	def apply_damage(damage)
+		damage.times do
+			hp -= 1
+
+			if hp <= MAX_HP * -5
+				destroyed? = true
+			elsif hp < 0 && hp % MAX_HP == 0
+				destroyed? = true unless d(3) < HT
+			end
+		end
 	end
 end

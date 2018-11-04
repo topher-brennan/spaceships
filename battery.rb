@@ -65,7 +65,8 @@ class Battery < System
 				end
 
 				# TODO: Handle spill-over into core, then other hull sections
-				# TODO: Apply damage to ship and check for survival
+
+				target.apply_damage(damage)
 			end
 		elsif attack_roll.is_critical_failure
 			disable
