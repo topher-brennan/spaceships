@@ -1,5 +1,5 @@
 class System
-  attr_accessor :section, :status
+  attr_accessor :section, :status, :parent
 
   def initialize
     @status = :undamaged
@@ -7,13 +7,17 @@ class System
 
 	def disable
 		if status == :undamaged
-			status = :disabled
+			@status = :disabled
 		else
-			status = :destroyed
+			@status = :destroyed
 		end
 	end
 
 	def destroy
-		status = :destroyed
+		@status = :destroyed
+	end
+
+	def ship
+		parent.ship
 	end
 end

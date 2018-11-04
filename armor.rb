@@ -2,6 +2,6 @@ require './system.rb'
 
 class Armor < System
 	def ddr
-		DDR
+		self.class::DDR
 	end
 end

@@ -1,17 +1,19 @@
 require './scale.rb'
 
 class Ship
-	attr_accessor :hp, :destroyed?
+	attr_accessor :hp, :destroyed, :front_hull, :central_hull, :rear_hull
 
 	MAX_HP = 15
 	HT = 12
 
 	CREW_SKILL = 11
-	HANDLING = 0 #TODO: make this a function that returns -2 if ship at 0 hp or less
+	HANDLING = 0 
+	#TODO: make HANDLING a function that returns -2 if ship at 0 hp or less
+	#Also TODO: support ships with 0.5G acceleration, which have Hnd -1.
 
 	def initialize(front_hull, central_hull, rear_hull)
 		@hp = MAX_HP
-		@destroyed? = false
+		@destroyed = false
 
 		@front_hull = front_hull
 		@central_hull = central_hull
@@ -32,17 +34,21 @@ class Ship
 
 	def apply_damage(damage)
 		damage.times do
-			hp -= 1
+			@hp -= 1
 
 			if hp <= MAX_HP * -5
-				destroyed? = true
+				destroyed = true
 			elsif hp < 0 && hp % MAX_HP == 0
-				destroyed? = true unless d(3) < HT
+				destroyed = true unless d(3) < HT
 			end
 		end
 	end
 
 	def deep_dup
-		# TODO
+		Ship.new(
+			front_hull.deep_dup,
+			central_hull.deep_dup,
+			rear_hull.deep_dup
+		)
 	end
 end

@@ -2,8 +2,6 @@ require './system.rb'
 require './gurps_utils.rb'
 
 class Battery < System
-	include GurpsUtils
-
 	RANGE_PENALTY = {
 		0 => 0, # point-blank
 		1 => -4, # close
@@ -15,18 +13,19 @@ class Battery < System
 	FIXED_BONUS = 2
 
 	def fire(hull_section, range)
-		raise ArgumentError.new("Max range exceeded.") if range > MAX_RANGE
+		raise ArgumentError.new("Max range exceeded.") if range > self.class::MAX_RANGE
 
 		target = hull_section.ship
 
-		effective_skill = self.section.ship.crew_skill + RANGE_PENALTY[range] + SHIP_SIZE + FIXED_BONUS + rof_bonus
-    attack_roll = success_roll(effective_skill)
+		# TODO: beam attacks get -2 if the ship is at 0 HP or less.
+		effective_skill = self.section.ship.skill + self.class::ACC + RANGE_PENALTY[range] + SHIP_SIZE + FIXED_BONUS + rof_bonus
+		attack_roll = GurpsUtils.success_roll(effective_skill)
 
 		if attack_roll.is_success
 			hits = [attack_roll.margin_of_success + 1, rof].min
 
-			unless attack_roll.is_critical_success
-				dodge_roll = success_roll(target.dodge, true)
+			unless attack_roll.is_critical_success # TODO: Drifting spacecraft can't dodge.
+				dodge_roll = GurpsUtils.success_roll(target.dodge, true)
 
 				if dodge_roll.is_success
 					hits -= dodge_roll.margin_of_success + 1
@@ -36,9 +35,9 @@ class Battery < System
 
 			hits.times do
 				damage = roll_damage
-			  damage = damage / 2 if range > HALF_D
+				damage = damage / 2 if range > self.class::HALF_D
 				
-				hit_location = d() - 1
+				hit_location = GurpsUtils.d() - 1
 				total_armor = 0
 
 				6.times do |i|
@@ -49,7 +48,7 @@ class Battery < System
 					end
 				end
 
-				damage -= (total_armor / ARMOR_DIVISOR).floor
+				damage -= (total_armor / self.class::ARMOR_DIVISOR).floor
 
 				unless hull_section.systems.all? { |system| system.status == :destroyed }
 					while hull_section.systems[hit_location].status == :destroyed
@@ -60,7 +59,7 @@ class Battery < System
 					if damage > Ship::MAX_HP / 2
 						hull_section.systems[hit_location].destroy
 					elsif damage > Ship::MAX_HP / 10
-						hull_section.systems[hit_location]
+						hull_section.systems[hit_location].disable
 					end
 				end
 
@@ -74,7 +73,7 @@ class Battery < System
 	end
 	
 	def rof
-		Scale::ROF_MULTIPLIER * BASE_ROF
+		Scale::ROF_MULTIPLIER * self.class::BASE_ROF
 	end
 
 	def rof_bonus
