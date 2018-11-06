@@ -1,5 +1,5 @@
 class System
-  attr_accessor :section, :status, :parent
+  attr_accessor :section, :status
 
   def initialize
     @status = :undamaged
@@ -18,6 +18,6 @@ class System
 	end
 
 	def ship
-		parent.ship
+		section.ship
 	end
 end

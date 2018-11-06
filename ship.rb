@@ -1,10 +1,13 @@
 require './scale.rb'
+require './gurps_utils.rb'
+require './fuel_tank.rb'
 
 class Ship
-	attr_accessor :hp, :destroyed, :front_hull, :central_hull, :rear_hull
+	attr_accessor :hp, :destroyed, :delta_v, :front_hull, :central_hull, :rear_hull
 
 	MAX_HP = 15
 	HT = 12
+	DELTA_V_PER_TANK = 0.45 # Nuclear thermal rockets.
 
 	CREW_SKILL = 11
 	HANDLING = 0 
@@ -22,6 +25,8 @@ class Ship
 		[front_hull, central_hull, rear_hull].each do
 		 	|section| section.ship = self
 		end
+		
+		@delta_v = starting_delta_v
 	end
 
 	def skill
@@ -37,9 +42,9 @@ class Ship
 			@hp -= 1
 
 			if hp <= MAX_HP * -5
-				destroyed = true
+				@destroyed = true
 			elsif hp < 0 && hp % MAX_HP == 0
-				destroyed = true unless d(3) < HT
+				@destroyed = true unless GurpsUtils.d(3) <= HT
 			end
 		end
 	end
@@ -50,5 +55,47 @@ class Ship
 			central_hull.deep_dup,
 			rear_hull.deep_dup
 		)
+	end
+
+	def starting_delta_v
+		fuel_tanks = 0
+
+		[@front_hull, @central_hull, @rear_hull].each do |section|
+			section.systems.each do |system|
+				fuel_tanks += 1 if system.class <= FuelTank
+			end
+
+			fuel_tanks += 1 if section.core && section.core.class <= FuelTank
+		end
+
+		dv_multiplier = nil
+
+		case fuel_tanks
+		when (0..5)
+			dv_multiplier = 1
+		when (6..8)
+			dv_multiplier = 1.2
+		when (9..12)
+			dv_multiplier = 1.4
+		when (13..14)
+			dv_multiplier = 1.6
+		when 15
+			dv_multiplier = 1.8
+		when 16
+			dv_multiplier = 2.0
+		else
+			dv_multiplier = 2.2
+		end
+
+		fuel_tanks * dv_multiplier * DELTA_V_PER_TANK
+	end
+
+	def systems
+		result = []
+		[@front_hull, @central_hull, @rear_hull].each do |section|
+			result = result.concat(section.systems)
+			result << section.core if section.core
+		end
+		result
 	end
 end

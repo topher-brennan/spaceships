@@ -1,7 +1,7 @@
 require './battery.rb'
 require './gurps_utils.rb'
 
-class UvLaser < Battery
+class ParticleBeam < Battery
 	ARMOR_DIVISOR = 3 # Assume all armor is hardened
 	ACC = 0
 	MAX_RANGE = 2 # Short range
