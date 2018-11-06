@@ -1,6 +1,7 @@
-require './scale.rb'
-require './gurps_utils.rb'
 require './fuel_tank.rb'
+require './gurps_utils.rb'
+require './nuclear_thermal_rocket.rb'
+require './scale.rb'
 
 class Ship
 	attr_accessor :hp, :destroyed, :delta_v, :front_hull, :central_hull, :rear_hull
@@ -10,9 +11,6 @@ class Ship
 	DELTA_V_PER_TANK = 0.45 # Nuclear thermal rockets.
 
 	CREW_SKILL = 11
-	HANDLING = 0 
-	#TODO: make HANDLING a function that returns -2 if ship at 0 hp or less
-	#Also TODO: support ships with 0.5G acceleration, which have Hnd -1.
 
 	def initialize(front_hull, central_hull, rear_hull)
 		@hp = MAX_HP
@@ -33,8 +31,14 @@ class Ship
 		CREW_SKILL
 	end
 
+	def handling
+		# TODO: -2 penalty to handling if ship at 0 hp or less.
+		# Also TODO: Support other engine types.
+		systems.count { |system| system.class == NuclearThermalRocket } > 1 ? 0 : -1
+	end
+
 	def dodge
-		skill / 2 + HANDLING + Scale::DODGE_BONUS
+		skill / 2 + handling + Scale::DODGE_BONUS
 	end
 
 	def apply_damage(damage)
