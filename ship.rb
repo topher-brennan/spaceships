@@ -102,4 +102,8 @@ class Ship
 		end
 		result
 	end
+
+	def is_threat?
+		!destroyed && systems.any? { |system| system.class <= Battery && system.status == :undamaged }
+	end
 end
