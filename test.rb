@@ -4,6 +4,7 @@ require './fuel_cell.rb'
 require './fuel_tank.rb'
 require './hull_section.rb'
 require './improved_laser.rb'
+require './launcher.rb'
 require './light_alloy.rb'
 require './metallic_laminate.rb'
 require './nanocomposite.rb'
@@ -22,12 +23,12 @@ total_kill_time = 0
 EXPERIMENTS.times do
 	ship1 = Ship.new(
 		HullSection.new([
-			Nanocomposite.new(),
-			Nanocomposite.new(),
-			Nanocomposite.new(),
-			AdvancedMetallicLaminate.new(),
-			AdvancedMetallicLaminate.new(),
-			ParticleBeam.new()],
+			LightAlloy.new(),
+			LightAlloy.new(),
+			LightAlloy.new(),
+			LightAlloy.new(),
+			FuelTank.new(),
+			SpinalUvLaser.new()],
 		nil),
 		HullSection.new([
 			AdvancedMetallicLaminate.new(),
@@ -53,7 +54,7 @@ EXPERIMENTS.times do
 
 	while round < 12 && ship2.is_threat?
 		round += 1
-		ship1.front_hull.systems[5].fire(ship2.front_hull, 2)
+		ship1.front_hull.systems[5].fire(ship2.front_hull, 3)
 	end
 
 	total_kill_time += round

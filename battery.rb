@@ -16,14 +16,23 @@ class Battery < System
 		raise ArgumentError.new("Max range exceeded.") if range > self.class::MAX_RANGE
 
 		target = hull_section.ship
-
-		# TODO: beam attacks get -2 if the ship is at 0 HP or less.
-		effective_skill = self.section.ship.skill + self.class::ACC + RANGE_PENALTY[range] + SHIP_SIZE + FIXED_BONUS + rof_bonus
-		attack_roll = GurpsUtils.success_roll(effective_skill)
+		attack_roll = GurpsUtils.success_roll(effective_skill(range))
 
 		if attack_roll.is_success
 			hits = [attack_roll.margin_of_success + 1, rof].min
 
+			# TODO: Need point defense system for point defense
+			# TODO: Multiple point defense in one turn is less effective
+			# Assume 3-minute scale
+			if is_ballistic?
+				pd_roll = GurpsUtils.success_roll(target.skill + 10, true)
+
+				if pd_roll.is_success
+					hits -= (pd_roll.margin_of_success + 1)
+					hits = [hits, 0].max
+				end
+			end
+			
 			unless attack_roll.is_critical_success # TODO: Drifting spacecraft can't dodge.
 				dodge_roll = GurpsUtils.success_roll(target.dodge, true)
 
@@ -72,6 +81,17 @@ class Battery < System
 		end
 	end
 	
+	def effective_skill(range)
+		# TODO: beam attacks get -2 if the ship is at 0 HP or less.
+		result = self.section.ship.skill
+		result += self.class::ACC
+		result += RANGE_PENALTY[range]
+		result += SHIP_SIZE
+	  result +=	FIXED_BONUS
+		result += rof_bonus
+		result
+	end
+
 	def rof
 		Scale::ROF_MULTIPLIER * self.class::BASE_ROF
 	end
@@ -91,5 +111,9 @@ class Battery < System
 		else # ROF > 30 not supported.
 			5
 		end
+	end
+
+	def is_ballistic?
+		false
 	end
 end	
