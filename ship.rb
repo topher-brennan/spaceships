@@ -1,3 +1,4 @@
+require './defensive_ecm.rb'
 require './fuel_tank.rb'
 require './gurps_utils.rb'
 require './nuclear_thermal_rocket.rb'
@@ -37,8 +38,12 @@ class Ship
 		systems.count { |system| system.class == NuclearThermalRocket } > 1 ? 0 : -1
 	end
 
+	def ecm_rating
+		systems.count { |system| system.class == DefensiveEcm }
+	end
+
 	def dodge
-		skill / 2 + handling + Scale::DODGE_BONUS
+		skill / 2 + handling + ecm_rating + Scale::DODGE_BONUS
 	end
 
 	def apply_damage(damage)

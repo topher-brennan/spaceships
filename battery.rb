@@ -16,7 +16,7 @@ class Battery < System
 		raise ArgumentError.new("Max range exceeded.") if range > self.class::MAX_RANGE
 
 		target = hull_section.ship
-		attack_roll = GurpsUtils.success_roll(effective_skill(range))
+		attack_roll = GurpsUtils.success_roll(effective_skill(range) - target.ecm_rating * 1)
 
 		if attack_roll.is_success
 			hits = [attack_roll.margin_of_success + 1, rof].min

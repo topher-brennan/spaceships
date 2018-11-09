@@ -1,5 +1,6 @@
 require './advanced_metallic_laminate.rb'
 require './control_room.rb'
+require './defensive_ecm.rb'
 require './fuel_cell.rb'
 require './fuel_tank.rb'
 require './hull_section.rb'
@@ -16,19 +17,19 @@ require './spinal_particle_beam.rb'
 require './spinal_uv_laser.rb'
 require './uv_laser.rb'
 
-EXPERIMENTS = 1000
+EXPERIMENTS = 10_000
 
 total_kill_time = 0
 
 EXPERIMENTS.times do
 	ship1 = Ship.new(
 		HullSection.new([
-			LightAlloy.new(),
-			LightAlloy.new(),
-			LightAlloy.new(),
-			LightAlloy.new(),
-			FuelTank.new(),
-			SpinalUvLaser.new()],
+			AdvancedMetallicLaminate.new(),
+			AdvancedMetallicLaminate.new(),
+			DefensiveEcm.new(),
+			DefensiveEcm.new(),
+			DefensiveEcm.new(),
+			SpinalImprovedLaser.new()],
 		nil),
 		HullSection.new([
 			AdvancedMetallicLaminate.new(),
@@ -54,13 +55,13 @@ EXPERIMENTS.times do
 
 	while round < 12 && ship2.is_threat?
 		round += 1
-		ship1.front_hull.systems[5].fire(ship2.front_hull, 3)
+		ship1.front_hull.systems[5].fire(ship2.front_hull, 2)
 	end
 
 	total_kill_time += round
 end
 
-average_kill_time = (total_kill_time.to_f / EXPERIMENTS).round
+average_kill_time = (total_kill_time.to_f / EXPERIMENTS).round(1)
 
 puts "Average kill time: #{average_kill_time}"
 
